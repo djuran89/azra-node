@@ -2,8 +2,8 @@ const done = { sucess: "ok" };
 
 exports.loginUser = async (req, res, next) => {
 	try {
-		const username = process.env.USER;
-		const password = process.env.PASS;
+		const username = process.env.USER_LOGIN;
+		const password = process.env.PASS_LOGIN;
 		const { Username, Password } = req.body;
 		if (username.toLocaleLowerCase() !== Username.toLocaleLowerCase()) throw new Error("Pogresan username");
 		if (password !== Password) throw new Error("Pogresana lozinka");
