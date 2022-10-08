@@ -12,7 +12,13 @@ const mongooseSchema = new Schema(
 		Drzava: { type: String, required: true },
 		Telefon: { type: String, required: true },
 		Email: { type: String, required: true },
+		Napomena: { type: String, required: false },
 		Orders: { type: Array, required: true },
+		Company: {
+			type: Schema.Types.ObjectId,
+			ref: "Company",
+			required: false,
+		},
 	},
 	{ timestamps: true }
 );

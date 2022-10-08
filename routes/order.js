@@ -7,5 +7,6 @@ const login = require("../middleware/login");
 router.get("/", login.isLogin, ctrl.getOrders);
 router.post("/", ctrl.createOrder);
 router.delete("/", login.isLogin, ctrl.deleteOrder);
+router.post("/company", ctrl.createOrderForCompany);
 
 module.exports = router;

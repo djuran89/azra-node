@@ -1,6 +1,6 @@
 const CompanyModel = require("./../models/company");
 const bcrypt = require("bcryptjs");
-const salt = bcrypt.genSaltSync(16);
+const salt = bcrypt.genSaltSync(8);
 
 const done = { sucess: "ok" };
 exports.createCompany = async (req, res, next) => {
@@ -11,8 +11,8 @@ exports.createCompany = async (req, res, next) => {
 		const Company = new CompanyModel({ ...requestAccount, Password: hashPassword });
 		await Company.save();
 
-		req.session.Company = requestAccount.CompanyName;
-		res.status(200).json(requestAccount.CompanyName);
+		req.session.Company = requestAccount.Email;
+		res.status(200).json(requestAccount.Email);
 	} catch (err) {
 		next(err);
 	}
@@ -21,15 +21,14 @@ exports.createCompany = async (req, res, next) => {
 exports.loginCompany = async (req, res, next) => {
 	try {
 		const { Email, Password } = req.body;
-
 		const findCompany = await CompanyModel.findOne({ Email });
-		if (findCompany === null) throw throwError("Email nije pronadjen.");
+		if (findCompany === null) throw Error("Email nije pronadjen.");
 
 		const comparePassword = await bcrypt.compare(Password, findCompany.Password);
-		if (!comparePassword) throw throwError("Pogresna lozinka.");
-
-		req.session.Company = findCompany.CompanyName;
-		res.status(200).json(findCompany.CompanyName);
+		if (!comparePassword) throw Error("Pogresna lozinka.");
+		
+		req.session.Company = findCompany.Email;
+		res.status(200).json(findCompany);
 	} catch (err) {
 		next(err);
 	}
@@ -37,7 +36,13 @@ exports.loginCompany = async (req, res, next) => {
 
 exports.isLoginCompany = async (req, res, next) => {
 	try {
-		res.status(200).json(req.session.Company);
+		const Email = req.session.Company;
+		if (!Email) return res.status(200).json(null);
+
+		const findCompany = await CompanyModel.findOne({ Email });
+		if (findCompany === null) req.session.destroy();
+
+		res.status(200).json(findCompany);
 	} catch (err) {
 		next(err);
 	}
@@ -45,7 +50,7 @@ exports.isLoginCompany = async (req, res, next) => {
 
 exports.logoutCompany = async (req, res, next) => {
 	try {
-		req.session.Company.destroy();
+		req.session.destroy();
 		res.status(200).json(done);
 	} catch (err) {
 		next(err);

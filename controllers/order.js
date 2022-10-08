@@ -53,4 +53,34 @@ const removeProperyOrder = (orders) => {
 			}
 		}
 	}
+	return orders;
+};
+
+exports.createOrderForCompany = async (req, res, next) => {
+	try {
+		const orders = removeProperyOrder(req.body.orders);
+		const user = req.body.user;
+		const model = {
+			Ime: `${user.CompanyName} - PIB: ${user.PIB}`,
+			Prezime: " ",
+			Adresa: user.DeliveryAddress,
+			PostanskiBroj: " ",
+			Grad: " ",
+			Drzava: " ",
+			Telefon: user.Phone,
+			Email: user.Email,
+			Napomena: user.Napomena,
+			Orders: orders,
+			Company: user._id,
+		};
+
+		if(orders.length === 0) throw Error("Poručbina nepostoji...")
+
+		const createOrder = new OrderModel(model);
+		const retVal = await createOrder.save();
+
+		res.status(200).json(done);
+	} catch (err) {
+		next(err);
+	}
 };
