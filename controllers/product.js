@@ -11,9 +11,18 @@ exports.getProductById = async (req, res, next) => {
 	}
 };
 
-exports.getProducts = async (req, res, next) => {
+exports.getActiveProducts = async (req, res, next) => {
 	try {
-		const findProducts = await ProductModel.find();
+		const findProducts = await ProductModel.find({ active: true });
+		res.status(200).json(findProducts);
+	} catch (err) {
+		next(err);
+	}
+};
+
+exports.getProductsAll = async (req, res, next) => {
+	try {
+		const findProducts = await ProductModel.find().select("-image");
 		res.status(200).json(findProducts);
 	} catch (err) {
 		next(err);
@@ -52,6 +61,20 @@ exports.updateProduct = async (req, res, next) => {
 	}
 };
 
+exports.updateProductActive = async (req, res, next) => {
+	try {
+		let product = req.body;
+		product.active = !product.active;
+
+		const updateProduct = await ProductModel.findByIdAndUpdate(product._id, product);
+		const findProducts = await ProductModel.find().select("-image");
+
+		res.status(200).json(findProducts);
+	} catch (err) {
+		next(err);
+	}
+};
+
 exports.removeProduct = async (req, res, next) => {
 	try {
 		const Product = req.body.product;
@@ -71,6 +94,16 @@ exports.createMany = async (req, res, next) => {
 		// 	const createOrder = new ProductModel(p);
 		// 	await createOrder.save();
 		// }
+
+		res.status(200).json(done);
+	} catch (err) {
+		next(err);
+	}
+};
+
+exports.updateMany = async (req, res, next) => {
+	try {
+		// const updateMany = await ProductModel.updateMany({ active: true });
 
 		res.status(200).json(done);
 	} catch (err) {

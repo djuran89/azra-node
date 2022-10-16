@@ -9,6 +9,7 @@ const mongooseSchema = new Schema(
 		image: { type: String, required: true },
 		category: { type: String, required: true },
 		colors: { type: Array, required: true },
+		active: { type: Boolean, default: true },
 	},
 	{ timestamps: true }
 );
