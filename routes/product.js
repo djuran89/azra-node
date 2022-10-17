@@ -11,6 +11,7 @@ router.get("/:productId", login.isLogin, ctrl.getProductById);
 router.post("/", login.isLogin, ctrl.createProduct);
 router.put("/", login.isLogin, ctrl.updateProduct);
 router.put("/active", login.isLogin, ctrl.updateProductActive);
+router.put("/price", login.isLogin, ctrl.updateProductPrice);
 
 // router.delete("/", login.isLogin, ctrl.removeProduct);
 // router.post("/createMany", login.isLogin, ctrl.createMany);

@@ -63,13 +63,18 @@ exports.updateProduct = async (req, res, next) => {
 
 exports.updateProductActive = async (req, res, next) => {
 	try {
-		let product = req.body;
-		product.active = !product.active;
+		await ProductModel.findByIdAndUpdate(req.body._id, { active: req.body.active });
+		res.status(200).json(done);
+	} catch (err) {
+		next(err);
+	}
+};
 
-		const updateProduct = await ProductModel.findByIdAndUpdate(product._id, product);
-		const findProducts = await ProductModel.find().select("-image");
-
-		res.status(200).json(findProducts);
+exports.updateProductPrice = async (req, res, next) => {
+	try {
+		if (isNaN(parseInt(req.body.price))) throw Error("Cena nije broj.");
+		await ProductModel.findByIdAndUpdate(req.body._id, { price: req.body.price });
+		res.status(200).json(done);
 	} catch (err) {
 		next(err);
 	}
