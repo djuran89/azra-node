@@ -7,7 +7,12 @@ const mongooseSchema = new Schema(
 		price: { type: Number, required: true },
 		description: { type: String, required: false },
 		image: { type: String, required: true },
-		category: { type: String, required: true },
+		category: { type: String, required: false },
+		categoryObj: {
+			type: Schema.Types.ObjectId,
+			ref: "Category",
+			// required: true,
+		},
 		colors: { type: Array, required: true },
 		active: { type: Boolean, default: true },
 	},

@@ -1,4 +1,6 @@
+const ObjectId = require("mongodb").ObjectID;
 const ProductModel = require("../models/product");
+const CategoryModel = require("../models/category");
 
 const done = { sucess: "ok" };
 
@@ -13,7 +15,9 @@ exports.getProductById = async (req, res, next) => {
 
 exports.getActiveProducts = async (req, res, next) => {
 	try {
-		const findProducts = await ProductModel.find({ active: true });
+		const findProducts = await ProductModel.find({ active: true }).select("-image").populate("categoryObj");
+		findProducts.map((el) => (el.category = el.categoryObj.name));
+
 		res.status(200).json(findProducts);
 	} catch (err) {
 		next(err);
@@ -113,5 +117,37 @@ exports.updateMany = async (req, res, next) => {
 		res.status(200).json(done);
 	} catch (err) {
 		next(err);
+	}
+};
+
+exports.toDo = async (req, res, next) => {
+	try {
+		const products = req.body;
+		for (const prod of products) {
+			// const findCategory = await CategoryModel.findOne({ name: prod.category });
+			// console.log(findCategory._id)
+			// console.log(findCategory)
+			// delete prod.category;
+			// const updateProduct = await ProductModel.findByIdAndUpdate(prod._id, { categoryObj: ObjectId(findCategory._id) });
+			// if (findCategory == null) {
+			// 	const newCategory = new CategoryModel({ name: prod.category });
+			// 	await newCategory.save();
+			// }
+		}
+
+		res.status(200).json(done);
+	} catch (err) {
+		next(err);
+	}
+};
+
+const saveImageToFile = async (products) => {
+	for (const prod of products) {
+		const base64Data = prod.image.replace(/^data:image\/png;base64,/, "");
+		const imageName = prod._id;
+
+		await require("fs").writeFileSync(`./../react/public/proizvodi/${imageName}.png`, base64Data, "base64", function (err) {
+			console.log(err);
+		});
 	}
 };
