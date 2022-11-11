@@ -11,7 +11,7 @@ const mongooseSchema = new Schema(
 		categoryObj: {
 			type: Schema.Types.ObjectId,
 			ref: "Category",
-			// required: true,
+			required: true,
 		},
 		colors: { type: Array, required: true },
 		active: { type: Boolean, default: true },

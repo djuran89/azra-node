@@ -26,8 +26,9 @@ exports.loginCompany = async (req, res, next) => {
 
 		const comparePassword = await bcrypt.compare(Password, findCompany.Password);
 		if (!comparePassword) throw Error("Pogresna lozinka.");
-		
+
 		req.session.Company = findCompany.Email;
+		req.session.CompanyId = findCompany._id;
 		res.status(200).json(findCompany);
 	} catch (err) {
 		next(err);

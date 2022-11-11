@@ -27,18 +27,30 @@ exports.getOrders = async (req, res, next) => {
 	}
 };
 
+exports.getOrdersByUser = async (req, res, next) => {
+	try {
+		const Company = req.session.CompanyId;
+		if (Company === undefined) return res.status(401).json("Unauthorized");
+
+		const findOrder = await OrderModel.find({ Company }).sort({ createdAt: -1 });
+		res.status(200).json(findOrder);
+	} catch (err) {
+		next(err);
+	}
+};
+
 exports.deleteOrder = async (req, res, next) => {
 	try {
-		const Order = req.body.Order;
-		const OrderId = ObjectId(Order._id);
-		delete Order._id;
+		// const Order = req.body.Order;
+		// const OrderId = ObjectId(Order._id);
+		// delete Order._id;
 
-		const createDeletedOrders = new DeletedOrders(Order);
-		await createDeletedOrders.save();
-		await OrderModel.deleteOne(OrderId);
+		// const createDeletedOrders = new DeletedOrders(Order);
+		// await createDeletedOrders.save();
+		// await OrderModel.deleteOne(OrderId);
 
-		const findOrder = await OrderModel.find();
-		res.status(200).json(findOrder);
+		// const findOrder = await OrderModel.find();
+		res.status(200).json(done);
 	} catch (err) {
 		next(err);
 	}
@@ -74,7 +86,7 @@ exports.createOrderForCompany = async (req, res, next) => {
 			Company: user._id,
 		};
 
-		if(orders.length === 0) throw Error("Poručbina nepostoji...")
+		if (orders.length === 0) throw Error("Poručbina nepostoji...");
 
 		const createOrder = new OrderModel(model);
 		const retVal = await createOrder.save();

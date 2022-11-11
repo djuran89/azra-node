@@ -1,4 +1,3 @@
-const https = require("https");
 const express = require("express");
 const mongoose = require("mongoose");
 const app = express();
@@ -13,6 +12,7 @@ const MONGODB_URI = process.env.MONGODB_URI;
 
 // SESSION
 const store = new MongoDBStore({ uri: MONGODB_URI, collection: "sessions" });
+
 app.use(
 	session({
 		secret: process.env.SESSION_SECRET,
@@ -25,7 +25,7 @@ app.use(
 // CROS
 app.use(
 	cors({
-		origin: process.env.CORSS_ORIGIN.split(','),
+		origin: process.env.CORSS_ORIGIN.split(","),
 		methods: ["GET", "POST", "PUT", "DELETE"],
 		credentials: true,
 	})
@@ -45,7 +45,7 @@ app.use("/api", mainRouter);
 // ERROR HANDLER
 app.use((err, req, res, next) => {
 	let statusCode = err.status || 500;
-	console.error(err)
+	console.error(err);
 	return res.status(statusCode).json(err.toString());
 });
 

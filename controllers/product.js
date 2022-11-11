@@ -1,4 +1,3 @@
-const ObjectId = require("mongodb").ObjectID;
 const ProductModel = require("../models/product");
 const CategoryModel = require("../models/category");
 
@@ -7,6 +6,7 @@ const done = { sucess: "ok" };
 exports.getProductById = async (req, res, next) => {
 	try {
 		const findProduct = await ProductModel.findById(req.params.productId);
+
 		res.status(200).json(findProduct);
 	} catch (err) {
 		next(err);
@@ -15,8 +15,7 @@ exports.getProductById = async (req, res, next) => {
 
 exports.getActiveProducts = async (req, res, next) => {
 	try {
-		const findProducts = await ProductModel.find({ active: true }).select("-image").populate("categoryObj");
-		findProducts.map((el) => (el.category = el.categoryObj.name));
+		const findProducts = await ProductModel.find({ active: true }).select("-image");
 
 		res.status(200).json(findProducts);
 	} catch (err) {
@@ -35,10 +34,9 @@ exports.getProductsAll = async (req, res, next) => {
 
 exports.getCategories = async (req, res, next) => {
 	try {
-		const findCategories = await ProductModel.find().select("category -_id");
-		const categories = [...new Set(findCategories.map((el) => el.category))];
+		const findCategories = await CategoryModel.find();
 
-		res.status(200).json(categories);
+		res.status(200).json(findCategories);
 	} catch (err) {
 		next(err);
 	}
@@ -46,8 +44,21 @@ exports.getCategories = async (req, res, next) => {
 
 exports.createProduct = async (req, res, next) => {
 	try {
+		const imageName = req.body._id;
+		const base64Data = req.body.image.replace(/^data:image\/png;base64,/, "");
+		const categoryId = req.body.categoryObj._id;
+
+		if (categoryId === undefined) {
+			const newCategory = await createCategory(req.body.categoryObj.name);
+			req.body.categoryObj = newCategory;
+		}
+
 		const createOrder = new ProductModel(req.body);
 		await createOrder.save();
+
+		// require("fs").writeFileSync(`${process.env.IMG_PATH}${imageName}.png`, base64Data, "base64", function (err) {
+		// 	throw new Error(err);
+		// });
 
 		res.status(200).json(createOrder);
 	} catch (err) {
@@ -57,7 +68,14 @@ exports.createProduct = async (req, res, next) => {
 
 exports.updateProduct = async (req, res, next) => {
 	try {
+		const imageName = req.body._id;
+		const base64Data = req.body.image.replace(/^data:image\/png;base64,/, "");
+
 		const updateProduct = await ProductModel.findByIdAndUpdate(req.body._id, req.body);
+
+		require("fs").writeFileSync(`${process.env.IMG_PATH}${imageName}.png`, base64Data, "base64", function (err) {
+			throw new Error(err);
+		});
 
 		res.status(200).json(updateProduct);
 	} catch (err) {
@@ -82,6 +100,13 @@ exports.updateProductPrice = async (req, res, next) => {
 	} catch (err) {
 		next(err);
 	}
+};
+
+const createCategory = async (name) => {
+	const createCategory = new CategoryModel({ name });
+	const saveCategory = await createCategory.save();
+
+	return saveCategory;
 };
 
 exports.removeProduct = async (req, res, next) => {

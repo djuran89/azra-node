@@ -24,6 +24,7 @@
     "macaddress": "^0.5.3",
     "memorystore": "^1.6.7",
     "moment": "^2.29.3",
+    "mongodb": "^4.11.0",
     "mongoose": "^6.2.10",
     "nodemailer": "^6.7.3",
     "request-ip": "^2.1.3",

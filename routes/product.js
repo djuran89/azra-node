@@ -6,7 +6,7 @@ const login = require("../middleware/login");
 
 router.get("/", ctrl.getActiveProducts);
 router.get("/all", login.isLogin, ctrl.getProductsAll);
-router.get("/category", login.isLogin, ctrl.getCategories);
+router.get("/category", ctrl.getCategories);
 router.get("/:productId", login.isLogin, ctrl.getProductById);
 
 router.post("/", login.isLogin, ctrl.createProduct);
