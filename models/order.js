@@ -14,6 +14,7 @@ const mongooseSchema = new Schema(
 		Email: { type: String, required: true },
 		Napomena: { type: String, required: false },
 		Orders: { type: Array, required: true },
+		Active: { type: Boolean, default: true },
 		Company: {
 			type: Schema.Types.ObjectId,
 			ref: "Company",

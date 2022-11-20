@@ -1,6 +1,5 @@
 const ProductModel = require("../models/product");
 const CategoryModel = require("../models/category");
-
 const done = { sucess: "ok" };
 
 exports.getProductById = async (req, res, next) => {
@@ -32,11 +31,21 @@ exports.getProductsAll = async (req, res, next) => {
 	}
 };
 
+// exports.getCategories = async (req, res, next) => {
+// 	try {
+// 		const findCategories = await CategoryModel.find();
+
+// 		res.status(200).json(findCategories);
+// 	} catch (err) {
+// 		next(err);
+// 	}
+// };
 exports.getCategories = async (req, res, next) => {
 	try {
-		const findCategories = await CategoryModel.find();
+		const findCategories = await ProductModel.find().select("category -_id");
+		const categories = [...new Set(findCategories.map((el) => el.category))];
 
-		res.status(200).json(findCategories);
+		res.status(200).json(categories);
 	} catch (err) {
 		next(err);
 	}
@@ -46,19 +55,13 @@ exports.createProduct = async (req, res, next) => {
 	try {
 		const imageName = req.body._id;
 		const base64Data = req.body.image.replace(/^data:image\/png;base64,/, "");
-		const categoryId = req.body.categoryObj._id;
 
-		if (categoryId === undefined) {
-			const newCategory = await createCategory(req.body.categoryObj.name);
-			req.body.categoryObj = newCategory;
-		}
+		await require("fs").writeFileSync(`${process.env.IMG_PATH}/${imageName}.png`, base64Data, "base64", function (err) {
+			console.log(err);
+		});
 
 		const createOrder = new ProductModel(req.body);
 		await createOrder.save();
-
-		// require("fs").writeFileSync(`${process.env.IMG_PATH}${imageName}.png`, base64Data, "base64", function (err) {
-		// 	throw new Error(err);
-		// });
 
 		res.status(200).json(createOrder);
 	} catch (err) {
@@ -71,12 +74,12 @@ exports.updateProduct = async (req, res, next) => {
 		const imageName = req.body._id;
 		const base64Data = req.body.image.replace(/^data:image\/png;base64,/, "");
 
-		const updateProduct = await ProductModel.findByIdAndUpdate(req.body._id, req.body);
-
-		require("fs").writeFileSync(`${process.env.IMG_PATH}${imageName}.png`, base64Data, "base64", function (err) {
-			throw new Error(err);
+		await require("fs").writeFileSync(`${process.env.IMG_PATH}/${imageName}.png`, base64Data, "base64", function (err) {
+			console.log(err);
 		});
 
+		const updateProduct = await ProductModel.findByIdAndUpdate(req.body._id, req.body);
+		console.log(req.body);
 		res.status(200).json(updateProduct);
 	} catch (err) {
 		next(err);

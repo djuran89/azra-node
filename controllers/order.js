@@ -1,6 +1,7 @@
 const ObjectId = require("mongodb").ObjectID;
 const OrderModel = require("./../models/order");
 const DeletedOrders = require("./../models/deletedOrders");
+const email = require("../middleware/email");
 
 const done = { sucess: "ok" };
 exports.createOrder = async (req, res, next) => {
@@ -10,7 +11,8 @@ exports.createOrder = async (req, res, next) => {
 		removeProperyOrder(order.Orders);
 
 		const createOrder = new OrderModel(order);
-		await createOrder.save();
+		const saveOrder = await createOrder.save();
+		email.send(saveOrder);
 
 		res.status(200).json(done);
 	} catch (err) {
@@ -20,7 +22,7 @@ exports.createOrder = async (req, res, next) => {
 
 exports.getOrders = async (req, res, next) => {
 	try {
-		const findOrder = await OrderModel.find();
+		const findOrder = await OrderModel.find({ $or: [{ Active: true }, { Active: null }] }).sort({ createdAt: -1 });
 		res.status(200).json(findOrder);
 	} catch (err) {
 		next(err);
@@ -41,31 +43,14 @@ exports.getOrdersByUser = async (req, res, next) => {
 
 exports.deleteOrder = async (req, res, next) => {
 	try {
-		// const Order = req.body.Order;
-		// const OrderId = ObjectId(Order._id);
-		// delete Order._id;
+		const Order = req.body.Order;
+		await OrderModel.findOneAndUpdate({ _id: Order._id }, { Active: false });
 
-		// const createDeletedOrders = new DeletedOrders(Order);
-		// await createDeletedOrders.save();
-		// await OrderModel.deleteOne(OrderId);
-
-		// const findOrder = await OrderModel.find();
-		res.status(200).json(done);
+		const findOrder = await OrderModel.find({ $or: [{ Active: true }, { Active: null }] }).sort({ createdAt: -1 });
+		res.status(200).json(findOrder);
 	} catch (err) {
 		next(err);
 	}
-};
-
-const removeProperyOrder = (orders) => {
-	const removePropery = ["smallDescription", "colors", "image", "description"];
-	for (const order of orders) {
-		for (const [key, value] of Object.entries(order)) {
-			if (removePropery.includes(key)) {
-				delete order[key];
-			}
-		}
-	}
-	return orders;
 };
 
 exports.createOrderForCompany = async (req, res, next) => {
@@ -89,10 +74,23 @@ exports.createOrderForCompany = async (req, res, next) => {
 		if (orders.length === 0) throw Error("Poručbina nepostoji...");
 
 		const createOrder = new OrderModel(model);
-		const retVal = await createOrder.save();
+		const saveOrder = await createOrder.save();
+		email.send(saveOrder);
 
 		res.status(200).json(done);
 	} catch (err) {
 		next(err);
 	}
+};
+
+const removeProperyOrder = (orders) => {
+	const removePropery = ["smallDescription", "colors", "image", "description"];
+	for (const order of orders) {
+		for (const [key, value] of Object.entries(order)) {
+			if (removePropery.includes(key)) {
+				delete order[key];
+			}
+		}
+	}
+	return orders;
 };
