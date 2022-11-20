@@ -22,7 +22,7 @@ exports.createOrder = async (req, res, next) => {
 
 exports.getOrders = async (req, res, next) => {
 	try {
-		const findOrder = await OrderModel.find({ $or: [{ Active: true }, { Active: null }] }).sort({ createdAt: -1 });
+		const findOrder = await OrderModel.find({ Active: true }).sort({ createdAt: -1 });
 		res.status(200).json(findOrder);
 	} catch (err) {
 		next(err);
@@ -46,7 +46,7 @@ exports.deleteOrder = async (req, res, next) => {
 		const Order = req.body.Order;
 		await OrderModel.findOneAndUpdate({ _id: Order._id }, { Active: false });
 
-		const findOrder = await OrderModel.find({ $or: [{ Active: true }, { Active: null }] }).sort({ createdAt: -1 });
+		const findOrder = await OrderModel.find({ Active: true }).sort({ createdAt: -1 });
 		res.status(200).json(findOrder);
 	} catch (err) {
 		next(err);
