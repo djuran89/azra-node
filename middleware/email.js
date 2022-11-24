@@ -30,28 +30,32 @@ exports.send = async (order) => {
 };
 
 const createHtml = (order) => {
-	return `<table border={0}>
-			<thead>
-				<tr>
-					<th>Proizvod</th>
-					<th>Kolicina</th>
-					<th>Cena</th>
-				</tr>
-			</thead>
-			<tbody>
-				 ${order.Orders.map(
-						(el, i) =>
-							`<tr key={${i}}>
-								<td style="padding: 4px">${el.name}</td>
-								<td style="padding: 4px">${reMapQuntitiy.setQuantityValue(el.quantity, el)}</td>
-								<td style="padding: 4px">${el.quantity * el.price},00 RSD</td>
-							</tr>`
-					)} 
-				<tr>
-					<td colSpan={2} style="padding: 4px">Ukupno</td>
-					<td colSpan={2} style="padding: 4px"></td>
-					<td style="padding: 4px">${order.Orders.map((el) => el.quantity * el.price).reduce((a, b) => a + b)},00 RSD</td>
-				</tr>
-			</tbody>
-		</table>`;
+	const napomena = order.Napomena !== "" ? `<div>Napomena: ${order.Napomena}</div>` : "";
+	return `<div>
+				<table border={0}>
+					<thead>
+						<tr>
+							<th>Proizvod</th>
+							<th>Kolicina</th>
+							<th>Cena</th>
+						</tr>
+					</thead>
+					<tbody>
+						${order.Orders.map(
+							(el, i) =>
+								`<tr key={${i}}>
+										<td style="padding: 4px">${el.name}</td>
+										<td style="padding: 4px">${reMapQuntitiy.setQuantityValue(el.quantity, el)}</td>
+										<td style="padding: 4px">${el.quantity * el.price},00 RSD</td>
+									</tr>`
+						)} 
+						<tr>
+							<td colSpan={2} style="padding: 4px">Ukupno</td>
+							<td colSpan={2} style="padding: 4px"></td>
+							<td style="padding: 4px">${order.Orders.map((el) => el.quantity * el.price).reduce((a, b) => a + b)},00 RSD</td>
+						</tr>
+					</tbody>
+				</table>
+				${napomena}
+			</div>`;
 };
