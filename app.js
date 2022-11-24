@@ -40,6 +40,9 @@ app.use(bodyParser.urlencoded({ extended: true, limit: "5mb" }));
 
 // ROUTER
 const mainRouter = require("./routes/index");
+app.use("/", (req, res, next) => {
+	res.status(200).json({ message: "Hello world." });
+});
 app.use("/api", mainRouter);
 
 // ERROR HANDLER
@@ -52,8 +55,8 @@ app.use((err, req, res, next) => {
 mongoose
 	.connect(MONGODB_URI)
 	.then(() => {
-		console.log("Server start...");
 		app.listen(process.env.PORT || 4000);
+		console.log(`Server is running on port ${process.env.PORT || 4000}`);
 	})
 	.catch((err) => {
 		console.log(err);

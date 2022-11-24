@@ -6,6 +6,9 @@ const userRoute = require("./user");
 const productRoute = require("./product");
 const companyRoute = require("./company");
 
+router.use("/", (req, res, next) => {
+	res.status(200).json({ message: "Welcome to the API" });
+});
 router.use("/order", orderRoute);
 router.use("/user", userRoute);
 router.use("/product", productRoute);
